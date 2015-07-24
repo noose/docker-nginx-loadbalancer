@@ -157,6 +157,8 @@ def parse_env(env=os.environ):
         m = link_pattern.match(var)
         if m:
             service_name = m.group('service_name')
+            if re.match('^DOCKER_', service_name):
+                continue
             service_port = int(m.group('service_port'))
             if service_port != 80:
                 service_port = env.get('%s_REMOTE_PORT' % (service_name))
