@@ -157,11 +157,14 @@ def parse_env(env=os.environ):
         m = link_pattern.match(var)
         if m:
             service_name = m.group('service_name')
-            service_port = int(m.group('service_port'))
+            service_port = env.get('%s_REMOTE_PORT' % (service_name))
+            remote_port = env.get('%s_REMOTE_PORT' % (service_name))
+            if remote_port:
+                service_port = remote_port
             if service_port != 80:
-                service_port = env.get('%s_REMOTE_PORT' % (service_name))
-                if not service_port:
+                if not remote_port:
                     continue
+            forwarded_host = env.get('%s_FORWARDED_HOST' % (service_name))
             if service_name in services:
                 services[service_name]['addresses'].append(value)
             else:
@@ -170,6 +173,7 @@ def parse_env(env=os.environ):
                     'addresses': [value],
                     'port': service_port,
                     'balancing_type': None,
+                    'forwarded_host': forwarded_host,
                 }
 
     # find service details
